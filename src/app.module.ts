@@ -1,14 +1,18 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule, RequestMethod, ValidationPipe } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { DogsModule } from "./dogs/dogs.module";
 import { CatsModule } from "./cats/cats.module";
 import { logger } from "./middleware/logger.middleware";
+import { APP_PIPE } from "@nestjs/core";
 
 @Module({
     imports: [DogsModule, CatsModule],
     controllers: [AppController],
-    providers: [AppService]
+    providers: [AppService, {
+        provide: APP_PIPE,
+        useClass: ValidationPipe
+    }]
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer): any {
