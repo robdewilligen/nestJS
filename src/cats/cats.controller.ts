@@ -3,19 +3,19 @@ import {
     Body,
     Controller,
     Delete,
-    ForbiddenException,
     Get,
     Param,
     ParseIntPipe,
     Post,
     Put,
-    UseFilters
+    UsePipes
 } from "@nestjs/common";
-import { CreateCatDto } from "./dto/create-cat.dto";
 import { UpdateCatDto } from "./dto/update-cat.dto";
 import { CatsService } from "./cats.service";
 import { Cat } from "./interfaces/cat.interface";
-import { HttpExceptionFilter } from "../exceptions/http-exception.filter";
+import { CreateCatDto } from "./dto/create-cat.dto";
+import { ZodValidationPipe } from "../pipes/zod-validation.pipes";
+import { createCatSchema } from "./schema/create-cats.schema";
 
 @Controller("cats")
 export class CatsController {
@@ -25,9 +25,9 @@ export class CatsController {
     
     // POST request to create a new Cat
     @Post()
-    @UseFilters(HttpExceptionFilter)
+    @UsePipes(new ZodValidationPipe(createCatSchema))
     async create(@Body() createCatDto: CreateCatDto) {
-        throw new ForbiddenException();
+        this.catsService.create(createCatDto);
     }
     
     // GET request to find all the cats
