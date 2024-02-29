@@ -8,6 +8,7 @@ import {
     ParseIntPipe,
     Post,
     Put,
+    UseGuards,
     UsePipes
 } from "@nestjs/common";
 import { UpdateCatDto } from "./dto/update-cat.dto";
@@ -16,15 +17,22 @@ import { Cat } from "./interfaces/cat.interface";
 import { CreateCatDto } from "./dto/create-cat.dto";
 import { ZodValidationPipe } from "../pipes/zod-validation.pipes";
 import { createCatSchema } from "./schema/create-cats.schema";
+import { RolesGuard } from "../guards/roles.guard";
+import { Roles } from "../decorators/roles.decorator";
 
+
+// The @UseGuards can take 1 or multiple arguments separted by a ","
 @Controller("cats")
+@UseGuards(RolesGuard)
 export class CatsController {
     // Declare and initialize catsService
     constructor(private catsService: CatsService) {
     }
     
     // POST request to create a new Cat
+    // Pipes can be used on method level by coding the @UsePipes declaration
     @Post()
+    @Roles(["admin"])
     @UsePipes(new ZodValidationPipe(createCatSchema))
     async create(@Body() createCatDto: CreateCatDto) {
         this.catsService.create(createCatDto);
